@@ -5,7 +5,6 @@ package global // import "go.opentelemetry.io/otel/internal/global"
 
 import (
 	"context"
-	"fmt"
 	"sync/atomic"
 
 	"go.opentelemetry.io/otel/metric"
@@ -230,6 +229,12 @@ func (i *sfCounter) Add(ctx context.Context, incr float64, opts ...metric.AddOpt
 	}
 }
 
+func (i *sfCounter) Remove(ctx context.Context, opts ...metric.RemoveOption) {
+	if ctr := i.delegate.Load(); ctr != nil {
+		ctr.(metric.Float64Counter).Remove(ctx, opts...)
+	}
+}
+
 type sfUpDownCounter struct {
 	embedded.Float64UpDownCounter
 
@@ -253,6 +258,12 @@ func (i *sfUpDownCounter) setDelegate(m metric.Meter) {
 func (i *sfUpDownCounter) Add(ctx context.Context, incr float64, opts ...metric.AddOption) {
 	if ctr := i.delegate.Load(); ctr != nil {
 		ctr.(metric.Float64UpDownCounter).Add(ctx, incr, opts...)
+	}
+}
+
+func (i *sfUpDownCounter) Remove(ctx context.Context, opts ...metric.RemoveOption) {
+	if ctr := i.delegate.Load(); ctr != nil {
+		ctr.(metric.Float64UpDownCounter).Remove(ctx, opts...)
 	}
 }
 
@@ -282,6 +293,12 @@ func (i *sfHistogram) Record(ctx context.Context, x float64, opts ...metric.Reco
 	}
 }
 
+func (i *sfHistogram) Remove(ctx context.Context, opts ...metric.RemoveOption) {
+	if ctr := i.delegate.Load(); ctr != nil {
+		ctr.(metric.Float64Histogram).Remove(ctx, opts...)
+	}
+}
+
 type siCounter struct {
 	embedded.Int64Counter
 
@@ -308,11 +325,10 @@ func (i *siCounter) Add(ctx context.Context, x int64, opts ...metric.AddOption) 
 	}
 }
 
-func (i *siCounter) Remove(ctx context.Context, opts ...metric.AddOption) {
-	fmt.Printf("### siCounter.Remove called\n")
-}
-
-func (i *siCounter) RemoveAll(ctx context.Context, opts ...metric.AddOption) {
+func (i *siCounter) Remove(ctx context.Context, opts ...metric.RemoveOption) {
+	if ctr := i.delegate.Load(); ctr != nil {
+		ctr.(metric.Int64Counter).Remove(ctx, opts...)
+	}
 }
 
 type siUpDownCounter struct {
@@ -341,6 +357,12 @@ func (i *siUpDownCounter) Add(ctx context.Context, x int64, opts ...metric.AddOp
 	}
 }
 
+func (i *siUpDownCounter) Remove(ctx context.Context, opts ...metric.RemoveOption) {
+	if ctr := i.delegate.Load(); ctr != nil {
+		ctr.(metric.Int64UpDownCounter).Remove(ctx, opts...)
+	}
+}
+
 type siHistogram struct {
 	embedded.Int64Histogram
 
@@ -364,5 +386,11 @@ func (i *siHistogram) setDelegate(m metric.Meter) {
 func (i *siHistogram) Record(ctx context.Context, x int64, opts ...metric.RecordOption) {
 	if ctr := i.delegate.Load(); ctr != nil {
 		ctr.(metric.Int64Histogram).Record(ctx, x, opts...)
+	}
+}
+
+func (i *siHistogram) Remove(ctx context.Context, opts ...metric.RemoveOption) {
+	if ctr := i.delegate.Load(); ctr != nil {
+		ctr.(metric.Int64Histogram).Remove(ctx, opts...)
 	}
 }
