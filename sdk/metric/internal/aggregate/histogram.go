@@ -109,6 +109,13 @@ func (s *histValues[N]) measure(ctx context.Context, value N, fltrAttr attribute
 	b.res.Offer(ctx, t, exemplar.NewValue(value), droppedAttr)
 }
 
+func (s *histValues[N]) remove(ctx context.Context, fltrAttr attribute.Set) {
+	s.valuesMu.Lock()
+	defer s.valuesMu.Unlock()
+
+	delete(s.values, fltrAttr.Equivalent())
+}
+
 // newHistogram returns an Aggregator that summarizes a set of measurements as
 // an histogram.
 func newHistogram[N int64 | float64](boundaries []float64, noMinMax, noSum bool, limit int, r func() exemplar.Reservoir) *histogram[N] {
