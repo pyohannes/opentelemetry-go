@@ -25,6 +25,7 @@ type valueMap[N int64 | float64] struct {
 	newRes func() exemplar.Reservoir
 	limit  limiter[sumValue[N]]
 	values map[attribute.Distinct]sumValue[N]
+	stale  map[attribute.Distinct]sumValue[N]
 }
 
 func newValueMap[N int64 | float64](limit int, r func() exemplar.Reservoir) *valueMap[N] {
@@ -32,6 +33,7 @@ func newValueMap[N int64 | float64](limit int, r func() exemplar.Reservoir) *val
 		newRes: r,
 		limit:  newLimiter[sumValue[N]](limit),
 		values: make(map[attribute.Distinct]sumValue[N]),
+		stale:  make(map[attribute.Distinct]sumValue[N]),
 	}
 }
 
@@ -58,7 +60,12 @@ func (s *valueMap[N]) remove(ctx context.Context, fltrAttr attribute.Set) {
 	s.Lock()
 	defer s.Unlock()
 
-	delete(s.values, fltrAttr.Equivalent())
+	var key = fltrAttr.Equivalent()
+
+	if val, ok := s.values[key]; ok {
+		s.stale[key] = val
+		delete(s.values, key)
+	}
 }
 
 // newSum returns an aggregator that summarizes a set of measurements as their
@@ -106,6 +113,7 @@ func (s *sum[N]) delta(dest *metricdata.Aggregation) int {
 	}
 	// Do not report stale values.
 	clear(s.values)
+	clear(s.stale)
 	// The delta collection cycle resets.
 	s.start = t
 
@@ -127,7 +135,7 @@ func (s *sum[N]) cumulative(dest *metricdata.Aggregation) int {
 	s.Lock()
 	defer s.Unlock()
 
-	n := len(s.values)
+	n := len(s.values) + len(s.stale)
 	dPts := reset(sData.DataPoints, n, n)
 
 	var i int
@@ -143,6 +151,17 @@ func (s *sum[N]) cumulative(dest *metricdata.Aggregation) int {
 		// overload the system.
 		i++
 	}
+	for _, value := range s.stale {
+		dPts[i].Attributes = value.attrs
+		dPts[i].StartTime = s.start
+		dPts[i].Time = t
+		dPts[i].NoRecordedValue = true
+		i++
+	}
+
+	// Stale attribute sets for which a no-record marker was emitted are not
+	// reported anymore.
+	clear(s.stale)
 
 	sData.DataPoints = dPts
 	*dest = sData
@@ -202,6 +221,7 @@ func (s *precomputedSum[N]) delta(dest *metricdata.Aggregation) int {
 	}
 	// Unused attribute sets do not report.
 	clear(s.values)
+	clear(s.stale)
 	s.reported = newReported
 	// The delta collection cycle resets.
 	s.start = t
@@ -224,7 +244,7 @@ func (s *precomputedSum[N]) cumulative(dest *metricdata.Aggregation) int {
 	s.Lock()
 	defer s.Unlock()
 
-	n := len(s.values)
+	n := len(s.values) + len(s.stale)
 	dPts := reset(sData.DataPoints, n, n)
 
 	var i int
@@ -237,8 +257,17 @@ func (s *precomputedSum[N]) cumulative(dest *metricdata.Aggregation) int {
 
 		i++
 	}
+	for _, value := range s.stale {
+		dPts[i].Attributes = value.attrs
+		dPts[i].StartTime = s.start
+		dPts[i].Time = t
+		dPts[i].NoRecordedValue = true
+		i++
+	}
+
 	// Unused attribute sets do not report.
 	clear(s.values)
+	clear(s.stale)
 
 	sData.DataPoints = dPts
 	*dest = sData
