@@ -207,6 +207,12 @@ type Float64Gauge interface {
 	// Use the WithAttributeSet (or, if performance is not a concern,
 	// the WithAttributes) option to include measurement attributes.
 	Record(ctx context.Context, value float64, options ...RecordOption)
+
+	// Removes an existing timeseries
+	//
+	// Use the WithAttributeSet or WithAttributes option to include measurement
+	// attributes.
+	Remove(ctx context.Context, options ...RemoveOption)
 }
 
 // Float64GaugeConfig contains options for synchronous gauge instruments that

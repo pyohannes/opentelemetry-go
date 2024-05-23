@@ -236,6 +236,9 @@ type Int64Gauge struct{ embedded.Int64Gauge }
 // Record performs no operation.
 func (Int64Gauge) Record(context.Context, int64, ...metric.RecordOption) {}
 
+// Remove performs no operation.
+func (Int64Gauge) Remove(context.Context, ...metric.RemoveOption) {}
+
 // Float64Gauge is an OpenTelemetry Gauge used to record instantaneous float64
 // measurements. It produces no telemetry.
 type Float64Gauge struct{ embedded.Float64Gauge }

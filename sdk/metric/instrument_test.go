@@ -26,11 +26,11 @@ func BenchmarkInstrument(b *testing.B) {
 		var meas []aggregate.Measure[int64]
 
 		build.Temporality = metricdata.CumulativeTemporality
-		in, _ := build.LastValue()
+		in, _, _ := build.LastValue()
 		meas = append(meas, in)
 
 		build.Temporality = metricdata.DeltaTemporality
-		in, _ = build.LastValue()
+		in, _, _ = build.LastValue()
 		meas = append(meas, in)
 
 		build.Temporality = metricdata.CumulativeTemporality
