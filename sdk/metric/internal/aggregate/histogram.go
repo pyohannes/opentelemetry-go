@@ -115,7 +115,7 @@ func (s *histValues[N]) remove(ctx context.Context, fltrAttr attribute.Set) {
 	s.valuesMu.Lock()
 	defer s.valuesMu.Unlock()
 
-	var key = fltrAttr.Equivalent()
+	key := fltrAttr.Equivalent()
 
 	if val, ok := s.values[key]; ok {
 		s.stale[key] = val

@@ -19,7 +19,7 @@ var now = time.Now
 // Measure receives measurements to be aggregated.
 type Measure[N int64 | float64] func(context.Context, N, attribute.Set)
 
-// Remove receives a time series to be deleted
+// Remove receives a time series to be deleted.
 type Remove func(context.Context, attribute.Set)
 
 // ComputeAggregation stores the aggregate of measurements into dest and

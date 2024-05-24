@@ -180,7 +180,7 @@ func testCumulativeSum[N int64 | float64]() func(t *testing.T) {
 	ctx := context.Background()
 	return test[N](in, remove, out, []teststep[N]{
 		{
-			input: []arg[N]{},
+			input:  []arg[N]{},
 			remove: []arg[N]{},
 			expect: output{
 				n: 0,
@@ -303,9 +303,9 @@ func testCumulativeSum[N int64 | float64]() func(t *testing.T) {
 							Value:      14,
 						},
 						{
-							Attributes: fltrBob,
-							StartTime:  y2kPlus(0),
-							Time:       y2kPlus(14),
+							Attributes:      fltrBob,
+							StartTime:       y2kPlus(0),
+							Time:            y2kPlus(14),
 							NoRecordedValue: true,
 						},
 						{
@@ -319,7 +319,7 @@ func testCumulativeSum[N int64 | float64]() func(t *testing.T) {
 			},
 		},
 		{
-			input: []arg[N]{},
+			input:  []arg[N]{},
 			remove: []arg[N]{},
 			expect: output{
 				n: 2,
@@ -356,7 +356,7 @@ func testDeltaPrecomputedSum[N int64 | float64]() func(t *testing.T) {
 	ctx := context.Background()
 	return test[N](in, remove, out, []teststep[N]{
 		{
-			input: []arg[N]{},
+			input:  []arg[N]{},
 			remove: []arg[N]{},
 			expect: output{
 				n: 0,
@@ -490,7 +490,7 @@ func testCumulativePrecomputedSum[N int64 | float64]() func(t *testing.T) {
 	ctx := context.Background()
 	return test[N](in, remove, out, []teststep[N]{
 		{
-			input: []arg[N]{},
+			input:  []arg[N]{},
 			remove: []arg[N]{},
 			expect: output{
 				n: 0,

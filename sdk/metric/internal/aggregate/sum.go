@@ -60,7 +60,7 @@ func (s *valueMap[N]) remove(ctx context.Context, fltrAttr attribute.Set) {
 	s.Lock()
 	defer s.Unlock()
 
-	var key = fltrAttr.Equivalent()
+	key := fltrAttr.Equivalent()
 
 	if val, ok := s.values[key]; ok {
 		s.stale[key] = val

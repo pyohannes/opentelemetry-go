@@ -66,7 +66,7 @@ func (s *lastValue[N]) remove(ctx context.Context, fltrAttr attribute.Set) {
 	s.Lock()
 	defer s.Unlock()
 
-	var key = fltrAttr.Equivalent()
+	key := fltrAttr.Equivalent()
 
 	if val, ok := s.values[key]; ok {
 		s.stale[key] = val
@@ -82,7 +82,7 @@ func (s *lastValue[N]) delta(dest *metricdata.Aggregation) int {
 	s.Lock()
 	defer s.Unlock()
 
-	n := s.copyDpts(&gData.DataPoints, false)
+	n := s.copyDpts(&gData.DataPoints)
 	// Do not report stale values.
 	clear(s.values)
 	clear(s.stale)
@@ -102,7 +102,7 @@ func (s *lastValue[N]) cumulative(dest *metricdata.Aggregation) int {
 	s.Lock()
 	defer s.Unlock()
 
-	n := s.copyDpts(&gData.DataPoints, true)
+	n := s.copyDptsWithStale(&gData.DataPoints)
 	// TODO (#3006): This will use an unbounded amount of memory if there
 	// are unbounded number of attribute sets being aggregated. Attribute
 	// sets that become "stale" need to be forgotten so this will not
@@ -118,12 +118,8 @@ func (s *lastValue[N]) cumulative(dest *metricdata.Aggregation) int {
 
 // copyDpts copies the datapoints held by s into dest. The number of datapoints
 // copied is returned.
-func (s *lastValue[N]) copyDpts(dest *[]metricdata.DataPoint[N], stale bool) int {
+func (s *lastValue[N]) copyDpts(dest *[]metricdata.DataPoint[N]) int {
 	n := len(s.values)
-	
-	if stale {
-		n += len(s.stale)
-	}
 
 	*dest = reset(*dest, n, n)
 
@@ -136,17 +132,34 @@ func (s *lastValue[N]) copyDpts(dest *[]metricdata.DataPoint[N], stale bool) int
 		collectExemplars(&(*dest)[i].Exemplars, v.res.Collect)
 		i++
 	}
-	if stale {
-		for _, v := range s.stale {
-			(*dest)[i].Attributes = v.attrs
-			(*dest)[i].StartTime = s.start
-			(*dest)[i].Time = v.timestamp
-			(*dest)[i].NoRecordedValue = true
-			i++
-		}
-	}
-	return n
 
+	return n
+}
+
+func (s *lastValue[N]) copyDptsWithStale(dest *[]metricdata.DataPoint[N]) int {
+	n := len(s.values) + len(s.stale)
+
+	*dest = reset(*dest, n, n)
+
+	var i int
+	for _, v := range s.values {
+		(*dest)[i].Attributes = v.attrs
+		(*dest)[i].StartTime = s.start
+		(*dest)[i].Time = v.timestamp
+		(*dest)[i].Value = v.value
+		collectExemplars(&(*dest)[i].Exemplars, v.res.Collect)
+		i++
+	}
+
+	for _, v := range s.stale {
+		(*dest)[i].Attributes = v.attrs
+		(*dest)[i].StartTime = s.start
+		(*dest)[i].Time = v.timestamp
+		(*dest)[i].NoRecordedValue = true
+		i++
+	}
+
+	return n
 }
 
 // newPrecomputedLastValue returns an aggregator that summarizes a set of
@@ -168,7 +181,7 @@ func (s *precomputedLastValue[N]) delta(dest *metricdata.Aggregation) int {
 	s.Lock()
 	defer s.Unlock()
 
-	n := s.copyDpts(&gData.DataPoints, false)
+	n := s.copyDpts(&gData.DataPoints)
 	// Do not report stale values.
 	clear(s.values)
 	clear(s.stale)
@@ -188,7 +201,7 @@ func (s *precomputedLastValue[N]) cumulative(dest *metricdata.Aggregation) int {
 	s.Lock()
 	defer s.Unlock()
 
-	n := s.copyDpts(&gData.DataPoints, true)
+	n := s.copyDptsWithStale(&gData.DataPoints)
 	// Do not report stale values.
 	clear(s.values)
 	clear(s.stale)

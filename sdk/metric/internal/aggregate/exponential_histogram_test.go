@@ -800,7 +800,7 @@ func testDeltaExpoHist[N int64 | float64]() func(t *testing.T) {
 		},
 		{
 			// Delta sums are expected to reset.
-			input: []arg[N]{},
+			input:  []arg[N]{},
 			remove: []arg[N]{},
 			expect: output{
 				n: 0,
@@ -881,7 +881,7 @@ func testCumulativeExpoHist[N int64 | float64]() func(t *testing.T) {
 	ctx := context.Background()
 	return test[N](in, remove, out, []teststep[N]{
 		{
-			input: []arg[N]{},
+			input:  []arg[N]{},
 			remove: []arg[N]{},
 			expect: output{
 				n: 0,
@@ -964,7 +964,7 @@ func testCumulativeExpoHist[N int64 | float64]() func(t *testing.T) {
 			},
 		},
 		{
-			input: []arg[N]{},
+			input:  []arg[N]{},
 			remove: []arg[N]{},
 			expect: output{
 				n: 1,
@@ -1093,7 +1093,7 @@ func testCumulativeExpoHist[N int64 | float64]() func(t *testing.T) {
 			},
 		},
 		{
-			input: []arg[N]{},
+			input:  []arg[N]{},
 			remove: []arg[N]{},
 			expect: output{
 				n: 1,

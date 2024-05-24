@@ -276,9 +276,9 @@ func testCumulativeLastValue[N int64 | float64]() func(*testing.T) {
 							Value:      1,
 						},
 						{
-							Attributes: fltrBob,
-							StartTime:  y2kPlus(0),
-							Time:       y2kPlus(9),
+							Attributes:      fltrBob,
+							StartTime:       y2kPlus(0),
+							Time:            y2kPlus(9),
 							NoRecordedValue: true,
 						},
 						{
@@ -291,7 +291,7 @@ func testCumulativeLastValue[N int64 | float64]() func(*testing.T) {
 				},
 			},
 		}, {
-			input: []arg[N]{},
+			input:  []arg[N]{},
 			remove: []arg[N]{},
 			expect: output{
 				n: 2,

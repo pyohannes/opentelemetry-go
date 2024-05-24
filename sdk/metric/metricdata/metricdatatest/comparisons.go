@@ -258,7 +258,7 @@ func equalDataPoints[N int64 | float64](a, b metricdata.DataPoint[N], cfg config
 		if !cfg.ignoreNoRecorded && !a.NoRecordedValue && !b.NoRecordedValue {
 			if a.Value != b.Value {
 				reasons = append(reasons, notEqualStr("Value", a.Value, b.Value))
-			}	
+			}
 		}
 	}
 
@@ -402,14 +402,14 @@ func equalExponentialHistogramDataPoints[N int64 | float64](a, b metricdata.Expo
 			if a.Sum != b.Sum {
 				reasons = append(reasons, notEqualStr("Sum", a.Sum, b.Sum))
 			}
-	
+
 			if a.Scale != b.Scale {
 				reasons = append(reasons, notEqualStr("Scale", a.Scale, b.Scale))
 			}
 			if a.ZeroCount != b.ZeroCount {
 				reasons = append(reasons, notEqualStr("ZeroCount", a.ZeroCount, b.ZeroCount))
 			}
-	
+
 			r := equalExponentialBuckets(a.PositiveBucket, b.PositiveBucket, cfg)
 			if len(r) > 0 {
 				reasons = append(reasons, r...)

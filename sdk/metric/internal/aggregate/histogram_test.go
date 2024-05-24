@@ -46,7 +46,7 @@ func TestHistogram(t *testing.T) {
 
 type conf[N int64 | float64] struct {
 	noSum bool
-	hPt        func(attribute.Set, N, uint64, time.Time, time.Time) metricdata.HistogramDataPoint[N]
+	hPt   func(attribute.Set, N, uint64, time.Time, time.Time) metricdata.HistogramDataPoint[N]
 }
 
 func (c conf[N]) hPtRemoved(attrs attribute.Set, value N, multi uint64, start time.Time, t time.Time) metricdata.HistogramDataPoint[N] {
@@ -152,7 +152,7 @@ func testCumulativeHist[N int64 | float64](c conf[N]) func(t *testing.T) {
 	ctx := context.Background()
 	return test[N](in, remove, out, []teststep[N]{
 		{
-			input: []arg[N]{},
+			input:  []arg[N]{},
 			remove: []arg[N]{},
 			expect: output{
 				n: 0,
@@ -200,7 +200,7 @@ func testCumulativeHist[N int64 | float64](c conf[N]) func(t *testing.T) {
 			},
 		},
 		{
-			input: []arg[N]{},
+			input:  []arg[N]{},
 			remove: []arg[N]{},
 			expect: output{
 				n: 2,
@@ -250,7 +250,7 @@ func testCumulativeHist[N int64 | float64](c conf[N]) func(t *testing.T) {
 			},
 		},
 		{
-			input: []arg[N]{},
+			input:  []arg[N]{},
 			remove: []arg[N]{},
 			expect: output{
 				n: 2,

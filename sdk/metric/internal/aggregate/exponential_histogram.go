@@ -342,7 +342,7 @@ func (e *expoHistogram[N]) remove(ctx context.Context, fltrAttr attribute.Set) {
 	e.valuesMu.Lock()
 	defer e.valuesMu.Unlock()
 
-	var key = fltrAttr.Equivalent()
+	key := fltrAttr.Equivalent()
 
 	if val, ok := e.values[key]; ok {
 		e.stale[key] = val

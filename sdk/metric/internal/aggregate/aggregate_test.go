@@ -108,8 +108,8 @@ func testBuilderFilter[N int64 | float64]() func(t *testing.T) {
 type arg[N int64 | float64] struct {
 	ctx context.Context
 
-	value  N
-	attr   attribute.Set
+	value N
+	attr  attribute.Set
 }
 
 type output struct {

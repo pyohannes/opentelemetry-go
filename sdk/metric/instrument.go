@@ -337,8 +337,10 @@ func (o *observable[N]) appendMeasures(meas []aggregate.Measure[N]) {
 	o.measures = append(o.measures, meas...)
 }
 
-type measures[N int64 | float64] []aggregate.Measure[N]
-type removers []aggregate.Remove
+type (
+	measures[N int64 | float64] []aggregate.Measure[N]
+	removers                    []aggregate.Remove
+)
 
 // observe records the val for the set of attrs.
 func (m measures[N]) observe(val N, s attribute.Set) {
